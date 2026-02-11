@@ -1,0 +1,255 @@
+const { 
+    default: makeWASocket, 
+    useMultiFileAuthState, 
+    DisconnectReason, 
+    fetchLatestBaileysVersion, 
+    makeCacheableSignalKeyStore 
+} = require('@whiskeysockets/baileys')
+
+const { Boom } = require('@hapi/boom')
+const pino = require('pino')
+const readline = require('readline')
+const config = require('./config') 
+
+const { runtime, getWIBTime, showBanner, logSuccess } = require('./display') 
+const { printLog } = require('./log') 
+
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+const question = (text) => new Promise((resolve) => rl.question(text, resolve))
+
+async function startBot() {
+    const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys')
+    const { version } = await fetchLatestBaileysVersion()
+
+    showBanner(config.botName, config.ownerName);
+
+    const sock = makeWASocket({
+        version,
+        auth: {
+            creds: state.creds,
+            keys: makeCacheableSignalKeyStore(
+                state.keys, 
+                pino({ level: 'fatal' }).child({ level: 'fatal' })
+            ),
+        },
+        printQRInTerminal: config.pairingMethod === '1',
+        logger: pino({ level: 'fatal' }),
+        browser: ["Ubuntu", "Chrome", "20.0.04"]
+    })
+
+    // Pairing Code Mode
+    if (!sock.authState.creds.registered && config.pairingMethod === '2') {
+        const phoneNumber = await question('Masukkan nomor WhatsApp (contoh: 628xxx): ')
+        const code = await sock.requestPairingCode(phoneNumber.trim())
+        console.log(`\nKODE PAIRING ANDA: \x1b[33m${code}\x1b[0m\n`)
+    }
+
+    sock.ev.on('creds.update', saveCreds)
+
+    sock.ev.on('connection.update', (update) => {
+        const { connection, lastDisconnect } = update
+        if (connection === 'close') {
+            const shouldReconnect =
+                (lastDisconnect.error instanceof Boom)?.output?.statusCode !== DisconnectReason.loggedOut
+            if (shouldReconnect) startBot()
+        } else if (connection === 'open') {
+            logSuccess(`${config.botName} Berhasil Terhubung ke Server!`)
+        }
+    })
+
+    sock.ev.on('messages.upsert', async m => {
+        try {
+            const msg = m.messages[0]
+            if (!msg.message || msg.key.fromMe) return
+
+            const from = msg.key.remoteJid
+            const pushName = msg.pushName || "Guest"
+            const type = Object.keys(msg.message)[0]
+
+            let body = (type === 'conversation') ? msg.message.conversation :
+                       (type === 'extendedTextMessage') ? msg.message.extendedTextMessage.text :
+                       (type === 'imageMessage') ? msg.message.imageMessage.caption :
+                       (type === 'videoMessage') ? msg.message.videoMessage.caption : ''
+
+            if (!body) return
+            const command = body.trim().toLowerCase()
+
+            printLog(type, from, pushName, body)
+
+            // ===== ROLE SYSTEM =====
+            const isGroup = from.endsWith('@g.us')
+            const sender = msg.key.participant || msg.key.remoteJid
+            const senderNumber = sender.split('@')[0]
+
+            let isAdmins = false
+            let isOwner = senderNumber === config.ownerNumber
+
+            if (isGroup) {
+                try {
+                    const groupMetadata = await sock.groupMetadata(from)
+                    const participants = groupMetadata.participants
+
+                    const adminList = participants
+                        .filter(p => p.admin !== null)
+                        .map(p => p.id.split('@')[0])
+
+                    isAdmins = adminList.includes(senderNumber)
+
+                } catch (err) {
+                    console.log("ERROR GET ADMIN:", err)
+                    isAdmins = false
+                }
+            }
+
+            const getTarget = () => {
+                let mention = msg.message.extendedTextMessage?.contextInfo?.mentionedJid || []
+                let reply = msg.message.extendedTextMessage?.contextInfo?.participant
+                    ? [msg.message.extendedTextMessage.contextInfo.participant]
+                    : []
+                return mention.length > 0 ? mention : reply
+            }
+
+            switch (command) {
+
+                case 'ping':
+                    await sock.sendMessage(from, { text: 'Bot aktif.' })
+                    break
+
+                case 'menu':
+                case 'help': {
+                    const uptimeText = runtime(process.uptime())
+                    const timeNow = getWIBTime()
+
+                    const menuEstetik = `╔═══━━━━━━─── • ───━━━━━━═══╗
+║     『 ⚔️ *${config.botName.toUpperCase()}* ⚔️ 』
+╠═══━━━━━━─── • ───━━━━━━═══╝
+║
+║ ❀ *Creator* : ${config.ownerName}
+║ ❀ *Time* : ${timeNow}
+║ ❀ *Runtime* : ${uptimeText}
+║
+╠═══━━━━━━─── • ───━━━━━━═══╗
+║           *LIST FEATURES*
+╠═══━━━━━━─── • ───━━━━━━═══╝
+║ ❀ ping
+║ ❀ runtime
+║ ❀ owner
+║ ❀ read
+║ ❀ help
+║ ❀ kick / add
+║ ❀ promote / demote
+╚═══━━━━━━─── • ───━━━━━━═══╝`
+
+                    await sock.sendMessage(from, {
+                        text: menuEstetik,
+                        contextInfo: {
+                            externalAdReply: {
+                                title: 'BloodSword',
+                                body: 'BloodSwordV2.1',
+                                thumbnailUrl: 'https://files.catbox.moe/zt1r7j.jpg',
+                                sourceUrl: 'https://whatsapp.com/channel/0029Va7gIOyBKfi4aw2cYy24',
+                                mediaType: 1,
+                                renderLargerThumbnail: true
+                            }
+                        }
+                    })
+                    break
+                }
+
+                // ===== GROUP FEATURES =====
+
+                case 'kick': {
+                    if (!isGroup)
+                        return await sock.sendMessage(from, { text: '❌ Hanya bisa di grup!' })
+
+                    if (!isAdmins && !isOwner)
+                        return await sock.sendMessage(from, { text: '❌ Kamu bukan Admin!' })
+
+                    let target = getTarget()
+                    if (target.length === 0)
+                        return await sock.sendMessage(from, { text: 'Tag atau reply orangnya!' })
+
+                    try {
+                        await sock.groupParticipantsUpdate(from, target, "remove")
+                        await sock.sendMessage(from, { text: 'Berhasil dikeluarkan. 👋' })
+                    } catch (err) {
+                        console.log("ERROR KICK:", err)
+                        await sock.sendMessage(from, { text: 'Gagal kick! Pastikan bot admin.' })
+                    }
+                    break
+                }
+
+                case 'promote': {
+                    if (!isGroup)
+                        return await sock.sendMessage(from, { text: '❌ Hanya bisa di grup!' })
+
+                    if (!isAdmins && !isOwner)
+                        return await sock.sendMessage(from, { text: '❌ Kamu bukan Admin!' })
+
+                    let target = getTarget()
+                    if (target.length === 0)
+                        return await sock.sendMessage(from, { text: 'Tag atau reply orangnya!' })
+
+                    try {
+                        await sock.groupParticipantsUpdate(from, target, "promote")
+                        await sock.sendMessage(from, { text: 'Sekarang dia jadi Admin. 👑' })
+                    } catch (err) {
+                        console.log("ERROR PROMOTE:", err)
+                        await sock.sendMessage(from, { text: 'Gagal promote! Cek console.' })
+                    }
+                    break
+                }
+
+                case 'demote': {
+                    if (!isGroup)
+                        return await sock.sendMessage(from, { text: '❌ Hanya bisa di grup!' })
+
+                    if (!isAdmins && !isOwner)
+                        return await sock.sendMessage(from, { text: '❌ Kamu bukan Admin!' })
+
+                    let target = getTarget()
+                    if (target.length === 0)
+                        return await sock.sendMessage(from, { text: 'Tag atau reply orangnya!' })
+
+                    try {
+                        await sock.groupParticipantsUpdate(from, target, "demote")
+                        await sock.sendMessage(from, { text: 'Jabatan admin dicabut. 📉' })
+                    } catch (err) {
+                        console.log("ERROR DEMOTE:", err)
+                        await sock.sendMessage(from, { text: 'Gagal demote! Cek console.' })
+                    }
+                    break
+                }
+
+                case 'owner':
+                    const vcard =
+                        'BEGIN:VCARD\nVERSION:3.0\n' +
+                        `FN:${config.ownerName}\n` +
+                        `TEL;type=CELL;type=VOICE;waid=${config.ownerNumber}:+${config.ownerNumber}\n` +
+                        'END:VCARD'
+
+                    await sock.sendMessage(from, {
+                        contacts: { displayName: config.ownerName, contacts: [{ vcard }] }
+                    })
+                    break
+
+                case 'runtime':
+                    await sock.sendMessage(from, { text: `Bot aktif: ${runtime(process.uptime())}` })
+                    break
+
+                case 'read':
+                    await sock.readMessages([msg.key])
+                    await sock.sendMessage(from, { text: 'Pesan dibaca ✅' })
+                    break
+
+                default:
+                    break
+            }
+
+        } catch (err) {
+            console.log("ERROR MESSAGE HANDLER:", err)
+        }
+    })
+}
+
+startBot()
