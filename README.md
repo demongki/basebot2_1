@@ -1,36 +1,121 @@
-# ⚔️ BLOODSWORD V2.1 ⚔️
-> **Professional WhatsApp Automation for Premium Services**
+⚔️ BloodSword Bot V2.1
 
-![Status](https://img.shields.io/badge/Status-Active-brightgreen) ![Node](https://img.shields.io/badge/Node-18.x-blue) ![Library](https://img.shields.io/badge/Library-Baileys-orange)
+BloodSword Bot V2.1 adalah WhatsApp Bot berbasis Baileys (WhiskeySockets) dengan sistem admin grup, welcome message otomatis, prefix command system (!), serta tampilan terminal estetik dan modular. Bot ini dibuat untuk kebutuhan personal maupun komunitas.
 
----
+🚀 Features
 
-## 🛡️ ABOUT THE PROJECT
-**BloodSword** adalah bot WhatsApp bot yang dirancang khusus untuk orang yang gamau ribet bikin bot dari awal
+!ping
 
----
+!runtime
 
-## 🔥 MAIN FEATURES
-* ✨ **Automated Greeting**: Sapaan selamat datang otomatis dengan foto profil member baru.
-* 🛡️ **Admin Defense**: Kontrol grup (Kick, Promote, Demote) hanya bisa diakses oleh yang berwenang.
-* 🎨 **Visual Terminal**: Banner ASCII kustom dan log chat terkotak (Box Log) yang rapi.
-* 💎 **Premium UI**: Pesan menu menggunakan kartu *External Ad Reply* dengan thumbnail besar.
-* ⚡ **High Speed**: Berbasis **WhiskeySockets/Baileys** yang ringan dan responsif.
+!owner
 
----
+!read
 
-## 🛠️ QUICK INSTALLATION
-Dapatkan bot kamu berjalan dalam 3 langkah mudah:
+!help / !menu
 
-1. **Install Dependencies**
-   ```bash
-   npm install @whiskeysockets/baileys @hapi/boom pino readline
-Setup ConfigPastikan config.js sudah berisi nomor WhatsApp-mu (Owner).Ignite!Bashnode index.js
-📜 COMMAND LIST (Prefix: !)📋 General CommandsCommandAction!menuMenampilkan dashboard fitur BloodSword!pingTest kecepatan respon bot!runtimeCek berapa lama server sudah menyala!ownerKirim VCard kontak WhatsApp Owner👮 Group AdministrationCommandActionRequirement!kickDepak member dari grupAdmin / Owner!promoteJadikan member sebagai AdminAdmin / Owner!demoteTurunkan jabatan AdminAdmin / Owner!readCentang biru otomatisOwner Only📂 DIRECTORY STRUCTUREPlaintext📦 BloodSword-Bot
- ┣ 📂 auth_info_baileys  # Sesi login (Keep Secret!)
- ┣ 📄 config.js          # Identitas Bot & Owner
- ┣ 📄 display.js         # Desain Visual & Waktu
- ┣ 📄 index.js           # Core Logic & Events
- ┣ 📄 log.js             # Terminal Design
- ┗ 📄 README.md          # Dokumentasi (You are here)
-🌐 CONNECT WITH USInstagram: @demo_ngkiOfficial Store: BloodSword Store<p align="center"><b>Developed by BloodSword Team © 2026</b></p>
+!kick
+
+!promote
+
+!demote
+
+Welcome Message Otomatis
+
+Admin Detection System
+
+Colored Terminal Log
+
+Pairing QR & Pairing Code
+
+🛠 Tech Stack
+
+Node.js
+
+Baileys (WhiskeySockets)
+
+Pino Logger
+
+Multi File Auth State
+
+ANSI Terminal Styling
+
+📦 Installation (Termux / VPS / Windows)
+1. Install Dependencies
+
+Termux:
+
+pkg update && pkg upgrade
+pkg install nodejs git
+
+
+Windows:
+Install Node.js dari https://nodejs.org
+
+2. Clone Repository
+git clone https://github.com/demongki/basebot2_1.git
+cd basebot2_1
+
+3. Install Module
+npm install
+
+4. Jalankan Bot
+node index.js
+
+
+Scan QR atau gunakan pairing sesuai konfigurasi.
+
+⚙️ Configuration
+
+Edit file config.js
+
+const config = {
+    ownerNumber: '628xxxxxxxxxx',
+    ownerName: 'Nama Kamu',
+    botName: 'BloodSword Bot',
+    pairingMethod: 'qr' // 'qr' atau 'pairing'
+}
+
+module.exports = config
+
+👑 Command Usage
+
+!ping → Cek bot aktif
+!runtime → Lama bot berjalan
+!owner → Kirim kontak owner
+!read → Tandai chat sebagai dibaca
+!kick @user → Keluarkan member
+!promote @user → Jadikan admin
+!demote @user → Hapus admin
+
+🔐 Admin Requirement
+
+Untuk menggunakan fitur !kick, !promote, dan !demote:
+
+Bot harus menjadi Admin grup
+
+User yang menjalankan perintah harus Admin
+
+🖥 Terminal System
+
+BloodSword Bot memiliki:
+
+Banner ASCII saat startup
+
+Log pesan masuk
+
+Status koneksi realtime
+
+Success & error indicator
+
+🛡 License
+
+MIT License
+Bebas digunakan dan dikembangkan kembali.
+
+👑 Creator
+
+Achmad Zakky Anwar
+BloodSword Bot V2.1
+Powered by Baileys Socket
+2026 ⚔️
