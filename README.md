@@ -1,121 +1,123 @@
-⚔️ BloodSword Bot V2.1
+<p align="center">
+<pre>
+██████╗ ██╗      ██████╗  ██████╗ ██████╗  ██████╗ ██╗    ██╗ ██████╗ ██████╗ 
+██╔══██╗██║     ██╔═══██╗██╔═══██╗██╔══██╗██╔═══██╗██║    ██║██╔═══██╗██╔══██╗
+██████╔╝██║     ██║   ██║██║   ██║██║  ██║██║   ██║██║ █╗ ██║██║   ██║██████╔╝
+██╔══██╗██║     ██║   ██║██║   ██║██║  ██║██║   ██║██║███╗██║██║   ██║██╔══██╗
+██████╔╝███████╗╚██████╔╝╚██████╔╝██████╔╝╚██████╔╝╚███╔███╔╝╚██████╔╝██║  ██║
+╚═════╝ ╚══════╝ ╚═════╝  ╚═════╝ ╚═════╝  ╚═════╝  ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝
 
-BloodSword Bot V2.1 adalah WhatsApp Bot berbasis Baileys (WhiskeySockets) dengan sistem admin grup, welcome message otomatis, prefix command system (!), serta tampilan terminal estetik dan modular. Bot ini dibuat untuk kebutuhan personal maupun komunitas.
+⚔️  BLOODSWORD BOT V2.1  ⚔️
+</pre>
+</p>
 
-🚀 Features
+<p align="center">
+Advanced WhatsApp Bot with Group Admin & Auto Welcome System
+</p>
 
-!ping
+---
 
-!runtime
+## 🧠 INFORMATION
 
-!owner
+| Property | Value |
+|-----------|--------|
+| Creator | Achmad Zakky Anwar |
+| Base | Baileys (WhiskeySockets) |
+| Node | v18+ |
+| Type | Multi Device |
+| Version | 2.1 |
 
-!read
+---
 
-!help / !menu
+## ⚔️ FEATURES
 
-!kick
+```
+> !ping        → Check bot status
+> !runtime     → Show bot uptime
+> !owner       → Show owner contact
+> !menu        → Display menu
+> !kick        → Remove member (Admin only)
+> !promote     → Promote member to admin
+> !demote      → Demote admin
+> Auto Welcome → Welcome new members
+> Auto Goodbye → Detect leaving members
+```
 
-!promote
+---
 
-!demote
+## 🚀 INSTALLATION
 
-Welcome Message Otomatis
+### 1️⃣ Clone Repository
+```bash
+git clone https://github.com/USERNAME/REPOSITORY.git
+cd REPOSITORY
+```
 
-Admin Detection System
-
-Colored Terminal Log
-
-Pairing QR & Pairing Code
-
-🛠 Tech Stack
-
-Node.js
-
-Baileys (WhiskeySockets)
-
-Pino Logger
-
-Multi File Auth State
-
-ANSI Terminal Styling
-
-📦 Installation (Termux / VPS / Windows)
-1. Install Dependencies
-
-Termux:
-
-pkg update && pkg upgrade
-pkg install nodejs git
-
-
-Windows:
-Install Node.js dari https://nodejs.org
-
-2. Clone Repository
-git clone https://github.com/demongki/basebot2_1.git
-cd basebot2_1
-
-3. Install Module
+### 2️⃣ Install Dependencies
+```bash
 npm install
+```
 
-4. Jalankan Bot
+### 3️⃣ Run Bot
+```bash
 node index.js
+```
 
+Scan QR / Pairing Code and you're connected.
 
-Scan QR atau gunakan pairing sesuai konfigurasi.
+---
 
-⚙️ Configuration
+## 🖥 TERMINAL PREVIEW
 
-Edit file config.js
+```
+[ SYSTEM ] Connecting to WhatsApp Server...
+[ SUCCESS ] BloodSword Bot Connected!
+[ GROUP UPDATE DETECTED ]
+[ INCOMING MESSAGE ]
+[ COMMAND EXECUTED ]
+```
 
-const config = {
-    ownerNumber: '628xxxxxxxxxx',
-    ownerName: 'Nama Kamu',
-    botName: 'BloodSword Bot',
-    pairingMethod: 'qr' // 'qr' atau 'pairing'
-}
+---
 
-module.exports = config
+## 🛡 REQUIREMENTS
 
-👑 Command Usage
+- NodeJS 18+
+- Stable Internet
+- WhatsApp Account (Not banned)
+- Bot must be Admin for group commands
 
-!ping → Cek bot aktif
-!runtime → Lama bot berjalan
-!owner → Kirim kontak owner
-!read → Tandai chat sebagai dibaca
-!kick @user → Keluarkan member
-!promote @user → Jadikan admin
-!demote @user → Hapus admin
+---
 
-🔐 Admin Requirement
+## 📂 PROJECT STRUCTURE
 
-Untuk menggunakan fitur !kick, !promote, dan !demote:
+```
+├── index.js
+├── config.js
+├── display.js
+├── log.js
+├── package.json
+└── auth_info_baileys/
+```
 
-Bot harus menjadi Admin grup
+---
 
-User yang menjalankan perintah harus Admin
+## ⚡ WARNING
 
-🖥 Terminal System
+This bot is for educational purposes.  
+Use wisely. Abuse = WhatsApp banned.
 
-BloodSword Bot memiliki:
+---
 
-Banner ASCII saat startup
+## 👑 OWNER
 
-Log pesan masuk
+```
+Name  : Achmad Zakky Anwar
+Bot   : BloodSword Bot
+Type  : Multi Device WhatsApp Bot
+```
 
-Status koneksi realtime
+---
 
-Success & error indicator
-
-🛡 License
-
-MIT License
-Bebas digunakan dan dikembangkan kembali.
-
-👑 Creator
-
-Achmad Zakky Anwar
-BloodSword Bot V2.1
-Powered by Baileys Socket
-2026 ⚔️
+<p align="center">
+⚔️ BloodSword V2.1 — Power • Stability • Control ⚔️
+</p>
